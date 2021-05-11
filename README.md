@@ -6,13 +6,15 @@ Correlate RF signal reception with location to calibrate coverage maps using SDR
 ## What exactly does this do?
 This program reads audio output by [SDR#](https://airspy.com/download/) and converts it into absolute signal strength values. The large number is RMS, and the smaller numbers are 'signal strength n% of the time' (for example, the signal strength a received signal exceeds 70% of the time; useful for mobile situations). At the bottom is a position readout from a serial-connected GPS using NMEA 0183 protocol (Signal Logger parses the GPGGA message, and validates checksums). Logging can be enabled, which stores the date/time, RMS signal level, signal level at various thresholds (more than what's displayed, for interpolation later), and location into a comma-separated text file with one line per display refresh. 
 
+## What does Signal Logger depend upon?
+Signal Logger is written in Python 3, and requires [pyserial](https://pypi.org/project/pyserial/) and [PyAudio](https://pypi.org/project/PyAudio/). You can install these dependencies with `pip install pyserial pyaudio` on your command line. I tested on Python 3.8.4 and 3.9.6, 64-bit; pyserial 3.4; and PyAudio 0.2.11. I would anticipate this program working on Python 3.4 and pyserial 2.x, for those Windows XP machines still out there. 
+
 ## How is YOUR receiver set up?
 I use an [RTL-SDR Blog V3 dongle](https://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/) connected to a [RTL-SDR Blog Wideband LNA](https://www.rtl-sdr.com/new-products-in-our-store-wideband-lna-spare-metal-v3-enclosures/) and a ~ 200 MHz highpass filter to eliminate FM broadcast and local police/fire signals that could cause the SDR to go into front-end overload. I run a fairly low RTL gain (usually index 11, which I think is around 20dB gain); you usually don't care about receiving signal strengths below -120dBm since most radios need about -116dBm for intelligible speech, and you want to have as much headroom available as possible for strong in-band or out-of-band signals to prevent front-end overload. Turn off ALL the AGC options! This program works on the principle of the SDR being capable of truly fixed gain. 
 
 I then tell SDRSharp to use [VB-Cable Hi-Fi](https://vb-audio.com/Cable/#DownloadASIOBridge) as the audio output, demodulator mode RAW (I/Q stereo output to soundcard), with Unity Gain enabled. At my settings (with gain somewhat lower than the optimum, external-noise-limited, value), I can resolve signals from about -115 dBm to -45 dBm. 
 
 ## How do I set up MY receivers?
-
 ### Audio Endpoints
 Before you can start telling Signal Logger where to find audio, you have to install a virtual audio cable or few in order for the audio, from which signal levels are derived, to travel between programs. I recommend [VB-Cable](https://vb-audio.com/Cable/) and [VB-Cable Hi-Fi](https://vb-audio.com/Cable/#DownloadASIOBridge). In your Windows Control Panel, Sound settings, you'll probably want to set the sample formats to 48000 Hz, 16-bit for the inputs *and* outputs of your installed virtual audio cables; the input must always match the output regardless of what you set it to. 
 
